@@ -1,0 +1,9 @@
+{
+  "name": "gpa-fpt-extension",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Browser extension tính GPA từ trang Báo cáo điểm FAP (FPT University)",
+  "scripts": {
+    "test": "node --test test/"
+  }
+}
