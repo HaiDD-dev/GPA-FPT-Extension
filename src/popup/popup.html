@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <title>GPA FPT</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div>
+        <h1>GPA FPT</h1>
+        <p class="sync" id="sync">Chưa đồng bộ bảng điểm</p>
+      </div>
+      <button id="open-fap" class="btn" type="button">Mở bảng điểm FAP ↗</button>
+    </header>
+
+    <section class="summary" aria-live="polite">
+      <div class="stat stat--main"><b id="gpa10">—</b><span>GPA hệ 10</span></div>
+      <div class="stat"><b id="gpa4">—</b><span>Hệ 4 · tham khảo</span></div>
+      <div class="stat"><b id="credits">0</b><span>Tín chỉ</span></div>
+      <div class="stat"><b id="count">0</b><span>Môn</span></div>
+    </section>
+    <p class="warn" id="warn" hidden></p>
+
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Tìm mã hoặc tên môn" autocomplete="off" />
+      <div class="toolbar__actions">
+        <button class="btn btn--sm" type="button" data-bulk="default" title="Chỉ tính các môn Passed, bỏ các môn không tính GPA">Mặc định</button>
+        <button class="btn btn--sm" type="button" data-bulk="graded">Chọn môn có điểm</button>
+        <button class="btn btn--sm" type="button" data-bulk="none">Bỏ chọn hết</button>
+      </div>
+    </div>
+
+    <main id="list"></main>
+    <p id="empty" class="empty" hidden>
+      Chưa có dữ liệu. Mở trang <b>Báo cáo điểm</b> trên FAP (đã đăng nhập) để extension tự đọc bảng điểm,
+      hoặc tự thêm môn ở bên dưới.
+    </p>
+
+    <details class="panel">
+      <summary>Thêm môn thủ công</summary>
+      <form id="add-form" class="add-form">
+        <input name="code" placeholder="Mã môn" required maxlength="20" />
+        <input name="name" placeholder="Tên môn (tuỳ chọn)" maxlength="80" />
+        <input name="credit" type="number" min="1" max="30" step="1" placeholder="Tín chỉ" required />
+        <input name="grade" type="number" min="0" max="10" step="0.1" placeholder="Điểm" />
+        <button class="btn btn--primary" type="submit">Thêm</button>
+      </form>
+    </details>
+
+    <details class="panel">
+      <summary>Cài đặt</summary>
+      <div class="settings">
+        <label class="field">
+          <span>Tiền tố mã môn mặc định không tính GPA</span>
+          <input id="excluded" type="text" spellcheck="false" />
+        </label>
+        <label class="check">
+          <input id="include-failed" type="checkbox" />
+          <span>Mặc định tính cả môn <i>Not passed</i> đã có điểm</span>
+        </label>
+        <button id="clear" class="btn btn--danger" type="button">Xoá toàn bộ dữ liệu đã lưu</button>
+      </div>
+    </details>
+
+    <script src="../lib/gpa.js"></script>
+    <script src="../lib/store.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

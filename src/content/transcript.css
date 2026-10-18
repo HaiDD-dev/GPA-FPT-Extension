@@ -1,0 +1,178 @@
+.fgpa-head {
+  white-space: nowrap;
+}
+
+.fgpa-check {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  vertical-align: middle;
+  cursor: pointer;
+  accent-color: #f26f21;
+}
+
+tr.fgpa-off > td:not(.fgpa-cell) {
+  opacity: 0.42;
+}
+
+.fgpa-whatif {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #fff1e8;
+  color: #b4470c;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.fgpa-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2147483000;
+  width: 248px;
+  border: 1px solid #e7e2dd;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(32, 20, 10, 0.16);
+  color: #1f1b17;
+  font: 13px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.fgpa-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 14px;
+  border-bottom: 1px solid #f0ebe6;
+}
+
+.fgpa-panel__title {
+  flex: 1;
+  color: #f26f21;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.fgpa-panel__mini {
+  display: none;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fgpa-icon-btn {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #6f655c;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fgpa-icon-btn:hover {
+  background: #f5f1ed;
+}
+
+.fgpa-panel__body {
+  padding: 12px 14px 14px;
+}
+
+.fgpa-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.fgpa-stat b {
+  display: block;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fgpa-stat:first-child b {
+  color: #f26f21;
+}
+
+.fgpa-stat span {
+  color: #7a7067;
+  font-size: 11px;
+}
+
+.fgpa-panel p {
+  margin: 0;
+}
+
+.fgpa-meta {
+  margin-top: 10px !important;
+  color: #4a433d;
+}
+
+.fgpa-warn {
+  margin-top: 6px !important;
+  color: #b4470c;
+  font-size: 12px;
+}
+
+.fgpa-warn:empty {
+  display: none;
+}
+
+.fgpa-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.fgpa-actions button {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #e2dbd4;
+  border-radius: 7px;
+  background: #fff;
+  color: #1f1b17;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.fgpa-actions button:hover {
+  border-color: #f26f21;
+  color: #b4470c;
+}
+
+.fgpa-hint {
+  margin-top: 10px !important;
+  color: #8a8077;
+  font-size: 11px;
+}
+
+.fgpa-panel.is-collapsed {
+  width: auto;
+}
+
+.fgpa-panel.is-collapsed .fgpa-panel__head {
+  border-bottom: 0;
+}
+
+.fgpa-panel.is-collapsed .fgpa-panel__body {
+  display: none;
+}
+
+.fgpa-panel.is-collapsed .fgpa-panel__mini {
+  display: inline;
+}
+
+@media print {
+  .fgpa-panel,
+  .fgpa-cell {
+    display: none !important;
+  }
+}
