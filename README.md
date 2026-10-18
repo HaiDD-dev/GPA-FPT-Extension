@@ -13,8 +13,8 @@ Extension cho Chrome / Edge / Cốc Cốc / Brave (Manifest V3). Extension tính
   - **Thêm môn thủ công**, không cần có trên FAP.
   - Tìm môn, các nút *Mặc định* / *Chọn môn có điểm* / *Bỏ chọn hết*.
   - Cài đặt danh sách tiền tố mã môn không tính GPA và tuỳ chọn tính cả môn *Not passed*.
-- GPA hệ 10 (trung bình có trọng số theo tín chỉ) và hệ 4 quy đổi theo thang chữ A/B+/B/C+/C/D+/D/F
-  (chỉ để tham khảo).
+- GPA hệ 10 (trung bình có trọng số theo tín chỉ, làm tròn 2 chữ số), xếp loại, và GPA hệ 4 quy đổi theo
+  bảng điểm chữ A+ … F của FPT (hệ 4 chỉ để tham khảo, theo Quy chế đào tạo, Điều 19).
 
 ### Quy tắc chọn mặc định
 
@@ -23,8 +23,10 @@ Một môn được tính mặc định khi thoả hết các điều kiện sau
 - nằm trong bảng chương trình đào tạo, không thuộc bảng *Subjects outside the curriculum*;
 - có số tín chỉ lớn hơn 0 và có điểm;
 - trạng thái là `Passed`;
-- mã môn không bắt đầu bằng `ENT`, `TRS`, `GDQP`, `VOV`, `TMI`, `OTP`. Đây là tiếng Anh dự bị, GDQP, Vovinam,
-  nhạc cụ truyền thống và định hướng; danh sách này sửa được trong phần Cài đặt.
+- mã môn không bắt đầu bằng `ENT`, `TRS`, `GDQP`, `OTP`, `VOV`, `OJT`, `TMI`. Đây là các *học phần điều kiện*
+  (tiếng Anh chuẩn bị, rèn luyện tập trung/GDQP, giáo dục thể chất/Vovinam, OJT), mà theo Quy chế đào tạo
+  (Điều 3.3, 20.3) không tính vào điểm trung bình, cộng thêm nhạc cụ truyền thống. Danh sách này sửa được
+  trong phần Cài đặt.
 
 Môn bạn đã nhập điểm dự kiến cũng được tính mặc định. Mọi lựa chọn tick/bỏ tick của bạn đều được ưu tiên hơn
 quy tắc trên và vẫn giữ nguyên khi bảng điểm được đồng bộ lại.

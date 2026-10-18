@@ -16,7 +16,7 @@
     </header>
     <div class="fgpa-panel__body">
       <div class="fgpa-stats">
-        <div class="fgpa-stat"><b data-field="gpa10"></b><span>Hệ 10</span></div>
+        <div class="fgpa-stat"><b data-field="gpa10"></b><span>Hệ 10<span data-field="rank"></span></span></div>
         <div class="fgpa-stat"><b data-field="gpa4"></b><span>Hệ 4 · tham khảo</span></div>
       </div>
       <p class="fgpa-meta" data-field="meta"></p>
@@ -148,6 +148,7 @@
     const summary = Gpa.summarize([...courses, ...state.manual], state);
     const gpa10 = Gpa.formatGpa(summary.gpa10);
     field('gpa10').textContent = gpa10;
+    field('rank').textContent = summary.gpa10 === null ? '' : ` · ${Gpa.rankOf(summary.gpa10)}`;
     field('gpa4').textContent = Gpa.formatGpa(summary.gpa4);
     field('mini').textContent = gpa10;
     const manualNote = state.manual.length ? ` (gồm ${state.manual.length} môn tự thêm)` : '';

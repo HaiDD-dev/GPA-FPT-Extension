@@ -160,6 +160,7 @@
   function renderSummary() {
     const summary = Gpa.summarize(allCourses(), state);
     $('#gpa10').textContent = Gpa.formatGpa(summary.gpa10);
+    $('#rank').textContent = summary.gpa10 === null ? '' : ` · ${Gpa.rankOf(summary.gpa10)}`;
     $('#gpa4').textContent = Gpa.formatGpa(summary.gpa4);
     $('#credits').textContent = summary.credits;
     $('#count').textContent = summary.count;

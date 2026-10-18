@@ -62,8 +62,8 @@ test('default selection counts only passed curriculum subjects outside the exclu
   const summary = Gpa.summarize(load(), state);
   assert.equal(summary.count, 3);
   assert.equal(summary.credits, 9);
-  assert.equal(summary.gpa10.toFixed(4), ((8 + 6 + 10) / 3).toFixed(4));
-  assert.equal(summary.gpa4.toFixed(4), ((3.5 + 2 + 4) / 3).toFixed(4));
+  assert.equal(summary.gpa10, 8); // (8 + 6 + 10) / 3
+  assert.equal(summary.gpa4, 3.33); // (3.5 + 2.5 + 4) / 3
 });
 
 test('explicit selection overrides the default rule', () => {
@@ -78,10 +78,10 @@ test('explicit selection overrides the default rule', () => {
 
 test('what-if grades are selected by default and replace the FAP grade', () => {
   const state = Gpa.emptyState();
-  state.overrides = { 'main:OJT202': 9, 'main:MAE101': 7 };
+  state.overrides = { 'main:SE_GRA_ELE': 9, 'main:MAE101': 7, 'main:OJT202': 10 };
   const summary = Gpa.summarize(load(), state);
-  assert.equal(summary.credits, 19);
-  assert.equal(summary.gpa10, (8 * 3 + 7 * 3 + 10 * 3 + 9 * 10) / 19);
+  assert.equal(summary.credits, 19); // OJT is a condition course: excluded even with a what-if grade
+  assert.equal(summary.gpa10, 8.68); // (8*3 + 7*3 + 10*3 + 9*10) / 19 = 8.684
 });
 
 test('includeFailed setting and excluded prefixes', () => {
@@ -96,12 +96,23 @@ test('manual courses count by default', () => {
   state.manual = [{ id: 'manual:a', source: 'manual', code: 'X', name: '', semester: '', term: null, credit: 4, grade: 5, status: '' }];
   const summary = Gpa.summarize([...load(), ...state.manual], state);
   assert.equal(summary.credits, 13);
-  assert.equal(summary.gpa10, (8 * 3 + 6 * 3 + 10 * 3 + 5 * 4) / 13);
+  assert.equal(summary.gpa10, 7.08); // (8*3 + 6*3 + 10*3 + 5*4) / 13 = 7.077
 });
 
-test('4-point conversion boundaries', () => {
-  assert.deepEqual([10, 8.5, 8.4, 8, 7, 6.9, 5.5, 5, 4.9, 4, 3.9, 0].map((g) => Gpa.toScale4(g).letter),
-    ['A', 'A', 'B+', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'D', 'F', 'F']);
+test('FPT letter / 4-point table and rank (Điều 19)', () => {
+  const grades = [10, 9, 8.9, 8.5, 8.4, 8, 7.9, 7.5, 7, 6.9, 6.5, 6, 5.9, 5.5, 5, 4.9, 0];
+  assert.deepEqual(grades.map((g) => Gpa.toScale4(g).letter),
+    ['A+', 'A+', 'A', 'A', 'A-', 'A-', 'B+', 'B+', 'B', 'B-', 'B-', 'C+', 'C', 'C', 'C-', 'F', 'F']);
+  assert.deepEqual([9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5, 0].map((g) => Gpa.toScale4(g).point),
+    [4, 3.75, 3.5, 3.25, 3, 2.75, 2.5, 2.25, 2, 0]);
+    assert.equal(Gpa.rankOf(8.2), 'Giỏi');
+  assert.equal(Gpa.rankOf(6.1), 'Trung bình khá');
+  assert.equal(Gpa.rankOf(null), '');
+});
+
+test('OJT is excluded by default even when graded', () => {
+  const [ojt] = Gpa.coursesFromTable(MAIN_HEADERS, [['1', '6', 'Fall2025', 'OJT202', '-', '-', 'OJT', '10', '9.0', 'Passed']], 'main');
+  assert.equal(Gpa.isSelected(ojt, Gpa.emptyState()), false);
 });
 
 test('groups semesters chronologically with unscheduled subjects last', () => {
@@ -115,5 +126,14 @@ test('grade parsing', () => {
   assert.equal(Gpa.parseGrade('-'), null);
   assert.equal(Gpa.parseGrade('11'), null);
   assert.equal(Gpa.formatGpa(null), '—');
-  assert.equal(Gpa.formatGpa(8.125), '8.13');
+  assert.equal(Gpa.parseGrade('8.25'), 8.3); // course grades: 1 decimal, half up
+  assert.equal(Gpa.parseGrade('8.35'), 8.4);
+});
+
+test('GPA is rounded half-up to 2 decimals without floating-point drift', () => {
+  const course = (code, credit, grade) => ({ id: `manual:${code}`, source: 'manual', code, name: '', semester: '', term: null, credit, grade, status: '' });
+  // Σ = 8.1*10 + 8.2*9 + 8.1*1 = 162.9 over 20 credits = 8.145 exactly -> 8.15
+  const summary = Gpa.summarize([course('A', 10, 8.1), course('B', 9, 8.2), course('C', 1, 8.1)], Gpa.emptyState());
+  assert.equal(summary.gpa10, 8.15);
+  assert.equal(Gpa.formatGpa(summary.gpa10), '8.15');
 });

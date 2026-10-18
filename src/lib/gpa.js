@@ -6,9 +6,11 @@
   'use strict';
 
   const DEFAULT_SETTINGS = Object.freeze({
-    // FPT subjects that do not count toward GPA: preparatory English (ENT, TRS),
-    // military education (GDQP), Vovinam (VOV), traditional instrument (TMI), orientation (OTP).
-    excludedPrefixes: ['ENT', 'TRS', 'GDQP', 'VOV', 'TMI', 'OTP'],
+    // FPT "học phần điều kiện" do not count toward GPA (Quy chế đào tạo, Điều 3.3 & 20.3):
+    // preparatory English (ENT, TRS), focused training / military education (GDQP, OTP),
+    // physical education (VOV), OJT. TMI (traditional instrument) is not named in the regulation, but
+    // FAP lists it in term 0 next to GDQP/VOV, i.e. in the focused-training stage.
+    excludedPrefixes: ['ENT', 'TRS', 'GDQP', 'OTP', 'VOV', 'OJT', 'TMI'],
     includeFailed: false,
     panelCollapsed: false,
   });
@@ -25,16 +27,19 @@
   };
   const REQUIRED_COLUMNS = ['code', 'credit', 'grade'];
 
-  // Vietnamese credit-system conversion (10-point -> letter / 4-point), used for reference only.
+  // FPT grading table (Quy chế đào tạo, Điều 19). The 10-point scale is official;
+  // letters and 4-point values are for reference only.
   const SCALE_4 = [
-    { min: 8.5, letter: 'A', point: 4.0 },
-    { min: 8.0, letter: 'B+', point: 3.5 },
-    { min: 7.0, letter: 'B', point: 3.0 },
-    { min: 6.5, letter: 'C+', point: 2.5 },
-    { min: 5.5, letter: 'C', point: 2.0 },
-    { min: 5.0, letter: 'D+', point: 1.5 },
-    { min: 4.0, letter: 'D', point: 1.0 },
-    { min: 0, letter: 'F', point: 0 },
+    { min: 9.0, letter: 'A+', point: 4.0, rank: 'Xuất sắc' },
+    { min: 8.5, letter: 'A', point: 3.75, rank: 'Giỏi' },
+    { min: 8.0, letter: 'A-', point: 3.5, rank: 'Giỏi' },
+    { min: 7.5, letter: 'B+', point: 3.25, rank: 'Khá' },
+    { min: 7.0, letter: 'B', point: 3.0, rank: 'Khá' },
+    { min: 6.5, letter: 'B-', point: 2.75, rank: 'Trung bình khá' },
+    { min: 6.0, letter: 'C+', point: 2.5, rank: 'Trung bình khá' },
+    { min: 5.5, letter: 'C', point: 2.25, rank: 'Trung bình' },
+    { min: 5.0, letter: 'C-', point: 2.0, rank: 'Trung bình' },
+    { min: 0, letter: 'F', point: 0, rank: 'Không đạt' },
   ];
 
   const SEASONS = ['spring', 'summer', 'fall'];
@@ -54,9 +59,18 @@
     return /^-?\d+(\.\d+)?$/.test(s) ? Number(s) : null;
   }
 
+  /** Course grades are rounded to one decimal place (Quy chế đào tạo, Điều 20.2). */
   function parseGrade(text) {
     const n = parseNumber(text);
-    return n !== null && n >= 0 && n <= 10 ? n : null;
+    return n !== null && n >= 0 && n <= 10 ? Math.round(n * 10 + 1e-9) / 10 : null;
+  }
+
+  /**
+   * numerator / denominator rounded half-up to 2 decimals (Điều 20.3), using integer
+   * division so cases like 8.145 do not round down through floating-point error.
+   */
+  function roundRatio2(numerator, denominator) {
+    return Math.round((numerator * 100) / denominator) / 100;
   }
 
   /** Returns { code: 3, credit: 7, ... } or null when the table is not a transcript. */
@@ -160,7 +174,9 @@
     return SCALE_4.find((step) => grade >= step.min);
   }
 
+  /** GPA = Σ(grade × credit) / Σ credit over counted courses, rounded to 2 decimals. */
   function summarize(courses, state) {
+    // Weighted sums are kept as integers (grade in tenths, 4-point in hundredths) for exact rounding.
     let credits = 0;
     let weighted10 = 0;
     let weighted4 = 0;
@@ -174,16 +190,16 @@
       }
       const grade = effectiveGrade(course, state);
       credits += course.credit;
-      weighted10 += grade * course.credit;
-      weighted4 += toScale4(grade).point * course.credit;
+      weighted10 += Math.round(grade * 10) * course.credit;
+      weighted4 += Math.round(toScale4(grade).point * 100) * course.credit;
       count += 1;
     }
     return {
       count,
       credits,
       selectedWithoutGrade,
-      gpa10: credits ? weighted10 / credits : null,
-      gpa4: credits ? weighted4 / credits : null,
+      gpa10: credits ? roundRatio2(weighted10, credits * 10) : null,
+      gpa4: credits ? roundRatio2(weighted4, credits * 100) : null,
     };
   }
 
@@ -210,6 +226,11 @@
     return value === null ? '—' : value.toFixed(2);
   }
 
+  /** Rank of an (already rounded) 10-point GPA using the bands of Điều 19. */
+  function rankOf(gpa10) {
+    return gpa10 === null ? '' : toScale4(gpa10).rank;
+  }
+
   const api = {
     DEFAULT_SETTINGS,
     normalizeText,
@@ -231,6 +252,7 @@
     summarize,
     groupBySemester,
     formatGpa,
+    rankOf,
   };
 
   root.FapGpa = api;
